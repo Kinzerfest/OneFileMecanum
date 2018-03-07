@@ -46,15 +46,23 @@ MecanumDrive mecanumDrive;
     public void drive(){
     	double turnThrottle = 0.0;
 	    //If the trigger is pressed, turn according to the joystick twist
-        if(primaryStick.getRawButton(1)) {
+    	
+    	if(primaryStick.getRawButton(1)) {
             turnThrottle = 0.6*primaryStick.getTwist();
-            }
-	    //So you can get POV in degrees. POV switch defaults at -1. It goes in 45 degree increments. 
+            } 
+    	else {
+    		turnThrottle = 0.0;
+    	}
         /*
-        if(primaryStick.getPOV() == -1) {
-        	turnThrottle = 0.0;
+        if (primaryStick.getPOV() == -1) {
+        if(primaryStick.getRawButton(1)) {
+        turnThrottle = 0.6*primaryStick.getTwist();
+        } 
+        else {
+        turnThrottle = 0.0;
+        }
         }else {
-            turnThrottle = limit(((angleDifference(navX.getAngle(), primaryStick.getPOV()))*0.02), 0.6);
+            turnThrottle = limit(angleDifference(navX.getAngle(), primaryStick.getPOV()) * 0.02, 0.4);
         }
         */
         mecanumDrive.driveCartesian(primaryStick.getX(), -primaryStick.getY(), turnThrottle, 0);
