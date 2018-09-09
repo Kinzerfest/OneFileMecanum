@@ -1,30 +1,25 @@
 package robot;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
-import edu.wpi.first.wpilibj.Servo;
 
 //import edu.wpi.first.wpilibj.SPI;
 //import com.kauailabs.navx.frc.AHRS;
 public class Robot extends TimedRobot {
     //Variable declarations
-    Spark leftFront, leftBack, rightFront, rightBack, climberMotor;
-    Servo gearSlideMotor;
+    VictorSP leftFront, leftBack, rightFront, rightBack;
     Joystick primaryStick;
     MecanumDrive mecanumDrive;
 
     //AHRS navX;
     public void robotInit() {
         //Motors and Servos
-        leftFront = new Spark(2);
-        leftBack = new Spark(1);
-        rightFront = new Spark(0);
-        rightBack = new Spark(3);
-        climberMotor = new Spark(4);
-        gearSlideMotor = new Servo(5);
-
+        leftFront = new VictorSP(3);
+        leftBack = new VictorSP(2);
+        rightFront = new VictorSP(0);
+        rightBack = new VictorSP(1);
         //navX = new AHRS(SPI.Port.kMXP);
         primaryStick = new Joystick(0);
         //MecanumDrive
@@ -40,8 +35,6 @@ public class Robot extends TimedRobot {
 
     public void teleopPeriodic() {
         drive();
-        climber();
-        gearSlide();
         //angleAdjustment();
     }
 
@@ -72,30 +65,6 @@ public class Robot extends TimedRobot {
         }
         */
         mecanumDrive.driveCartesian(primaryStick.getX() * speedMultiplier, -primaryStick.getY() * speedMultiplier, turnThrottle, 0);
-    }
-
-    public void gearSlide() {
-        //Left buttons on the joystick
-        //If both buttons are pressed, go to middle value.
-        //If upper button is pressed, go to the upper position... ect....
-        if (primaryStick.getRawButton(5) && primaryStick.getRawButton(3)) {
-            gearSlideMotor.set(0.48);
-        } else if (primaryStick.getRawButton(5)) {
-            gearSlideMotor.set(0.73);
-        } else if (primaryStick.getRawButton(3)) {
-            gearSlideMotor.set(0.35);
-        }
-    }
-
-    public void climber() {
-        //Right Buttons on the joystick
-        if (primaryStick.getRawButton(6)) {
-            climberMotor.set(1);
-        } else if (primaryStick.getRawButton(4)) {
-            climberMotor.set(-0.3);
-        } else {
-            climberMotor.set(0);
-        }
     }
 
     /*
