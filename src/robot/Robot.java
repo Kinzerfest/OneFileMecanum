@@ -6,8 +6,11 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.Servo;
 
-//import edu.wpi.first.wpilibj.SPI;
-//import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.SPI;
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class Robot extends TimedRobot {
     //Variable declarations
     Spark leftFront, leftBack, rightFront, rightBack, climberMotor;
@@ -15,7 +18,8 @@ public class Robot extends TimedRobot {
     Joystick primaryStick;
     MecanumDrive mecanumDrive;
 
-    //AHRS navX;
+    AHRS navX;
+
     public void robotInit() {
         //Motors and Servos
         leftFront = new Spark(2);
@@ -25,11 +29,12 @@ public class Robot extends TimedRobot {
         climberMotor = new Spark(4);
         gearSlideMotor = new Servo(5);
 
-        //navX = new AHRS(SPI.Port.kMXP);
+        navX = new AHRS(SPI.Port.kMXP);
         primaryStick = new Joystick(0);
         //MecanumDrive
         mecanumDrive = new MecanumDrive(leftFront, leftBack, rightFront, rightBack);
         mecanumDrive.setDeadband(0.18); //Sets deadzone for Mecanum Drive
+
     }
 
     public void autonomousInit() {
@@ -39,10 +44,11 @@ public class Robot extends TimedRobot {
     }
 
     public void teleopPeriodic() {
+        SmartDashboard.putNumber("NavX Angle: " , navX.getAngle());
         drive();
         climber();
         gearSlide();
-        //angleAdjustment();
+        angleAdjustment();
     }
 
     public void testPeriodic() {
@@ -51,7 +57,7 @@ public class Robot extends TimedRobot {
     //--------------------------------------------Robot Methods------------------------------------------//
     public void drive() {
         double turnThrottle = 0.0;
-        double speedMultiplier = (primaryStick.getZ() + 1) / 2;
+        double speedMultiplier = ((primaryStick.getThrottle() + 1) / 2);
         //If the trigger is pressed, turn according to the joystick twist
 
         if (primaryStick.getRawButton(1)) {
@@ -59,18 +65,16 @@ public class Robot extends TimedRobot {
         } else {
             turnThrottle = 0.0;
         }
-        /*
+
         if (primaryStick.getPOV() == -1) {
-        if(primaryStick.getRawButton(1)) {
-        turnThrottle = 0.6*primaryStick.getTwist();
-        } 
-        else {
-        turnThrottle = 0.0;
-        }
-        }else {
+            if (primaryStick.getRawButton(1)) {
+                turnThrottle = 0.6 * primaryStick.getTwist();
+            } else {
+                turnThrottle = 0.0;
+            }
+        } else {
             turnThrottle = limit(angleDifference(navX.getAngle(), primaryStick.getPOV()) * 0.02, 0.4);
         }
-        */
         mecanumDrive.driveCartesian(primaryStick.getX() * speedMultiplier, -primaryStick.getY() * speedMultiplier, turnThrottle, 0);
     }
 
@@ -98,16 +102,19 @@ public class Robot extends TimedRobot {
         }
     }
 
-    /*
+
     public void angleAdjustment() {
-    	if(primaryStick.getRawButton(11)) {
-    	navX.setAngleAdjustment(navX.getAngleAdjustment()+1.125);
-    	}
-    	if(primaryStick.getRawButton(12)) {
-        navX.setAngleAdjustment(navX.getAngleAdjustment()-1.125);
+        if (primaryStick.getRawButton(11)) {
+            navX.setAngleAdjustment(navX.getAngleAdjustment() + 1.125);
+        }
+        if (primaryStick.getRawButton(12)) {
+            navX.setAngleAdjustment(navX.getAngleAdjustment() - 1.125);
+        }
+        if (primaryStick.getRawButton(10)) {
+            navX.reset();
         }
     }
-    */
+
     //--------------------------------------------Utility Methods---------------------------------------//
     public static double limit(double value, double limit) {
         if (value > limit) {
