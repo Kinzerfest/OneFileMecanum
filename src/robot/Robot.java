@@ -7,13 +7,14 @@ import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.SPI;
 import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
     //Variable declarations
     Spark leftFront, leftBack, rightFront, rightBack, climberMotor;
-    SendableChooser <Boolean> robotCentric = new SendableChooser<>();
+    SendableChooser<Boolean> robotCentric = new SendableChooser<>();
     Servo gearSlideMotor;
     Joystick primaryStick;
     MecanumDrive mecanumDrive;
@@ -47,18 +48,36 @@ public class Robot extends TimedRobot {
 
     public void teleopPeriodic() {
         SmartDashboard.putNumber("NavX Angle: ", navX.getAngle());
+        SmartDashboard.putData(robotCentric);
         drive();
         climber();
         gearSlide();
         angleAdjustment();
+        liveWindow(false);
     }
 
     public void testPeriodic() {
+        liveWindow(true);
+    }
+
+    public void liveWindow(boolean motors) {
+        LiveWindow.add(mecanumDrive);
+        LiveWindow.add(navX);
+        if (motors) {
+            LiveWindow.add(gearSlideMotor);
+            LiveWindow.add(climberMotor);
+            LiveWindow.add(leftFront);
+            LiveWindow.add(leftBack);
+            LiveWindow.add(rightFront);
+            LiveWindow.add(rightBack);
+        }
+
+
     }
 
     //--------------------------------------------Robot Methods------------------------------------------//
     public void drive() {
-        double turnThrottle = 0.0, gyroAngle = 0.0;
+        double turnThrottle, gyroAngle;
         double speedMultiplier = ((primaryStick.getThrottle() + 1) / 2);
         //If the trigger is pressed, turn according to the joystick twist
 
@@ -78,9 +97,9 @@ public class Robot extends TimedRobot {
             turnThrottle = limit(angleDifference(navX.getAngle(), primaryStick.getPOV()) * 0.02, 0.4);
         }
 
-        if (!robotCentric.getSelected()) gyroAngle = (-1)*(navX.getAngle());
+        if (!robotCentric.getSelected()) gyroAngle = (-1) * (navX.getAngle());
         else gyroAngle = 0.0;
-        
+
         mecanumDrive.driveCartesian(primaryStick.getX() * speedMultiplier, -primaryStick.getY() * speedMultiplier, turnThrottle, gyroAngle);
     }
 
