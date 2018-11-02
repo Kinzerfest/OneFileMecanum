@@ -60,7 +60,7 @@ public class Robot extends TimedRobot {
     public void liveWindow(boolean motors) {
         SmartDashboard.putNumber("NavX Angle: ", navX.getYaw());
         LiveWindow.add(mecanumDrive);
-        LiveWindow.add(navX);
+        SmartDashboard.putData("NavX", navX);
         if (motors) {
             LiveWindow.add(gearSlideMotor);
             LiveWindow.add(climberMotor);
